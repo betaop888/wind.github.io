@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Generate balanced integer prices in ars for Wind prices site."""
 
 from __future__ import annotations
