@@ -196,31 +196,31 @@ FLOAT_OVERRIDES = {
     "deepslate_diamond_ore": 1.0,
     "diamond": 1.0,
     "diamond_block": 9.0,
-    "raw_iron": 0.2,
-    "iron_ingot": 0.24,
-    "iron_block": 2.2,
-    "raw_copper": 0.12,
-    "copper_ingot": 0.15,
-    "copper_block": 1.3,
-    "raw_gold": 0.24,
-    "gold_ingot": 0.3,
-    "gold_block": 2.7,
+    "raw_iron": 1 / 64,
+    "iron_ingot": 1 / 64,
+    "iron_block": 9 / 64,
+    "raw_copper": 1 / 64,
+    "copper_ingot": 1 / 64,
+    "copper_block": 9 / 64,
+    "raw_gold": 2 / 64,
+    "gold_ingot": 2 / 64,
+    "gold_block": 18 / 64,
     "emerald": 0.55,
     "emerald_block": 4.9,
-    "coal": 0.06,
-    "charcoal": 0.06,
-    "lapis_lazuli": 0.16,
-    "redstone": 0.1,
-    "quartz": 0.2,
-    "ancient_debris": 12.0,
-    "netherite_scrap": 22.0,
-    "netherite_ingot": 64.0,
-    "netherite_block": 576.0,
+    "coal": 1 / 64,
+    "charcoal": 1 / 64,
+    "lapis_lazuli": 4 / 64,
+    "redstone": 2 / 64,
+    "quartz": 2 / 64,
+    "ancient_debris": 8.0,
+    "netherite_scrap": 5.0,
+    "netherite_ingot": 20.0,
+    "netherite_block": 180.0,
     "totem_of_undying": 8.0,
     "elytra": 180.0,
     "shulker_shell": 12.0,
     "nether_star": 70.0,
-    "beacon": 180.0,
+    "beacon": 56.0,
     "enchanted_golden_apple": 220.0,
     "trident": 35.0,
     "dragon_egg": 500.0,
@@ -274,6 +274,10 @@ INTEGER_OVERRIDES = {
     "ghast_tear": (1, 2),
     "disc_fragment_5": (1, 4),
     "ominous_trial_key": (1, 14),
+    "netherite_ingot": (1, 20),
+    "beacon": (1, 56),
+    "iron_ingot": (64, 1),
+    "bread": (64, 1),
 }
 
 PER_ITEM_TOKENS = {
@@ -316,6 +320,7 @@ COMPRESSION_RELATIONS = (
     ("raw_iron", "raw_iron_block", 9.0),
     ("raw_gold", "raw_gold_block", 9.0),
     ("raw_copper", "raw_copper_block", 9.0),
+    ("netherite_ingot", "netherite_block", 9.0),
 )
 
 # Fortune III expected drop multipliers:
@@ -454,16 +459,16 @@ def infer_price_float(item: dict[str, object]) -> float:
         price = 1.3
 
     if contains_token(name, KEYWORD_SETS["farmable"]):
-        price *= 0.76
+        price *= 0.65
     if contains_token(name, KEYWORD_SETS["redstone"]):
         price *= 1.35
     if contains_token(name, KEYWORD_SETS["food"]):
         price *= 0.95
     if contains_token(name, KEYWORD_SETS["rare"]):
-        price *= 5.8
+        price *= 3.5
 
     if "ore" in name:
-        price *= 2.0
+        price *= 1.6
     if "deepslate_" in name:
         price *= 1.12
     if "waxed_" in name or "oxidized_" in name:
@@ -488,15 +493,15 @@ def infer_price_float(item: dict[str, object]) -> float:
     elif "stone_" in name:
         price *= 0.75
     elif "iron_" in name:
-        price *= 1.9
+        price *= 0.8
     elif "golden_" in name:
-        price *= 1.7
+        price *= 1.2
     elif "diamond_" in name:
-        price *= 4.0
+        price *= 2.8
     elif "netherite_" in name:
-        price *= 10.0
+        price *= 4.0
     elif "chainmail_" in name:
-        price *= 2.6
+        price *= 1.8
 
     if name in LIMITED_ITEMS:
         price *= 1.8
