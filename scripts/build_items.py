@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-"""Generate survival item price list for Wind Prices site."""
+﻿#!/usr/bin/env python3
+"""Generate balanced integer prices in ars for Wind prices site."""
 
 from __future__ import annotations
 
 import json
-import math
 import urllib.request
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -64,7 +62,6 @@ KEYWORD_SETS = {
         "feather",
         "gunpowder",
         "honey",
-        "iron",
         "kelp",
         "leather",
         "melon",
@@ -107,7 +104,6 @@ KEYWORD_SETS = {
         "sniffer_egg",
         "smithing_template",
         "trident",
-        "wind_charge",
         "wither_skeleton_skull",
     },
     "redstone": {
@@ -170,25 +166,8 @@ KEYWORD_SETS = {
     },
 }
 
-
-@dataclass(frozen=True)
-class MaterialPrice:
-    token: str
-    multiplier: float
-
-
-MATERIAL_MULTIPLIERS = (
-    MaterialPrice("wooden_", 0.55),
-    MaterialPrice("stone_", 0.7),
-    MaterialPrice("iron_", 1.9),
-    MaterialPrice("golden_", 1.7),
-    MaterialPrice("diamond_", 4.3),
-    MaterialPrice("netherite_", 14.0),
-    MaterialPrice("chainmail_", 2.6),
-)
-
-
-OVERRIDES = {
+# Float anchors preserve previous relative balance, then rounded to integer ars.
+FLOAT_OVERRIDES = {
     "oak_log": 1 / 64,
     "spruce_log": 1 / 64,
     "birch_log": 1 / 64,
@@ -214,54 +193,53 @@ OVERRIDES = {
     "bamboo_block": 1 / 64,
     "diamond_ore": 1.0,
     "deepslate_diamond_ore": 1.0,
-    "diamond": 0.9,
-    "diamond_block": 8.1,
-    "raw_iron": 0.18,
-    "iron_ingot": 0.22,
-    "iron_block": 1.95,
-    "raw_copper": 0.1,
-    "copper_ingot": 0.14,
-    "copper_block": 1.2,
-    "raw_gold": 0.22,
-    "gold_ingot": 0.28,
-    "gold_block": 2.45,
-    "emerald": 0.52,
-    "emerald_block": 4.6,
-    "coal": 0.05,
-    "charcoal": 0.05,
-    "lapis_lazuli": 0.14,
-    "redstone": 0.08,
-    "quartz": 0.16,
+    "diamond": 1.0,
+    "diamond_block": 9.0,
+    "raw_iron": 0.2,
+    "iron_ingot": 0.24,
+    "iron_block": 2.2,
+    "raw_copper": 0.12,
+    "copper_ingot": 0.15,
+    "copper_block": 1.3,
+    "raw_gold": 0.24,
+    "gold_ingot": 0.3,
+    "gold_block": 2.7,
+    "emerald": 0.55,
+    "emerald_block": 4.9,
+    "coal": 0.06,
+    "charcoal": 0.06,
+    "lapis_lazuli": 0.16,
+    "redstone": 0.1,
+    "quartz": 0.2,
     "ancient_debris": 12.0,
     "netherite_scrap": 22.0,
-    "netherite_ingot": 90.0,
-    "netherite_block": 810.0,
+    "netherite_ingot": 64.0,
+    "netherite_block": 576.0,
     "totem_of_undying": 8.0,
-    "elytra": 220.0,
-    "shulker_shell": 15.0,
-    "nether_star": 85.0,
-    "beacon": 220.0,
-    "enchanted_golden_apple": 260.0,
-    "trident": 48.0,
-    "dragon_egg": 640.0,
-    "dragon_head": 120.0,
-    "heart_of_the_sea": 40.0,
+    "elytra": 180.0,
+    "shulker_shell": 12.0,
+    "nether_star": 70.0,
+    "beacon": 180.0,
+    "enchanted_golden_apple": 220.0,
+    "trident": 35.0,
+    "dragon_egg": 500.0,
+    "dragon_head": 110.0,
+    "heart_of_the_sea": 30.0,
     "nautilus_shell": 3.0,
-    "echo_shard": 9.0,
-    "disc_fragment_5": 5.0,
-    "recovery_compass": 36.0,
+    "echo_shard": 8.0,
+    "disc_fragment_5": 4.0,
+    "recovery_compass": 30.0,
     "bottle_o_enchanting": 2.0,
     "enchanted_book": 6.0,
-    "wind_charge": 2.5,
     "ominous_trial_key": 14.0,
-    "wither_skeleton_skull": 7.5,
+    "wither_skeleton_skull": 7.0,
     "ghast_tear": 2.0,
-    "blaze_rod": 0.45,
-    "ender_pearl": 0.55,
-    "gunpowder": 0.18,
+    "blaze_rod": 0.5,
+    "ender_pearl": 0.6,
+    "gunpowder": 0.2,
     "slime_ball": 0.35,
-    "golden_apple": 4.2,
-    "golden_carrot": 0.9,
+    "golden_apple": 4.0,
+    "golden_carrot": 1.0,
 }
 
 LIMITED_ITEMS = {
@@ -272,6 +250,56 @@ LIMITED_ITEMS = {
     "nether_star",
     "ominous_trial_key",
     "sniffer_egg",
+}
+
+# Hard integer rules (trade_count, price_ars)
+INTEGER_OVERRIDES = {
+    "oak_log": (64, 1),
+    "spruce_log": (64, 1),
+    "birch_log": (64, 1),
+    "jungle_log": (64, 1),
+    "acacia_log": (64, 1),
+    "dark_oak_log": (64, 1),
+    "mangrove_log": (64, 1),
+    "cherry_log": (64, 1),
+    "pale_oak_log": (64, 1),
+    "crimson_stem": (64, 1),
+    "warped_stem": (64, 1),
+    "diamond_ore": (1, 1),
+    "deepslate_diamond_ore": (1, 1),
+    "diamond": (1, 1),
+    "totem_of_undying": (1, 8),
+    "golden_apple": (1, 4),
+    "ghast_tear": (1, 2),
+    "disc_fragment_5": (1, 4),
+    "ominous_trial_key": (1, 14),
+}
+
+PER_ITEM_TOKENS = {
+    "diamond",
+    "netherite",
+    "ancient_debris",
+    "totem",
+    "elytra",
+    "trident",
+    "shulker_shell",
+    "nether_star",
+    "beacon",
+    "enchanted_golden_apple",
+    "heart_of_the_sea",
+    "nautilus_shell",
+    "echo_shard",
+    "recovery_compass",
+    "dragon_egg",
+    "dragon_head",
+    "wither_skeleton_skull",
+    "music_disc",
+    "disc_fragment",
+    "smithing_template",
+    "mace",
+    "ominous_trial_key",
+    "ghast_tear",
+    "golden_apple",
 }
 
 
@@ -313,9 +341,7 @@ def classify(name: str) -> str:
         return "Руды и ресурсы"
     if contains_token(name, KEYWORD_SETS["redstone"]):
         return "Редстоун и механизмы"
-    if contains_token(name, KEYWORD_SETS["combat"]) or contains_token(
-        name, KEYWORD_SETS["tool"]
-    ):
+    if contains_token(name, KEYWORD_SETS["combat"]) or contains_token(name, KEYWORD_SETS["tool"]):
         return "Инструменты и бой"
     if contains_token(name, KEYWORD_SETS["food"]):
         return "Еда и фермерство"
@@ -353,16 +379,6 @@ def obtainability(name: str) -> str:
     return "Обычный"
 
 
-def normalize(price: float) -> float:
-    if price < 1:
-        return round(price, 4)
-    if price < 10:
-        return round(price, 3)
-    if price < 100:
-        return round(price, 2)
-    return round(price, 1)
-
-
 def fallback_display_name(item_name: str) -> str:
     return item_name.replace("_", " ").title()
 
@@ -375,41 +391,41 @@ def pick_ru_name(item_name: str, en_display_name: str, ru_lang: dict[str, str]) 
     return en_display_name if en_display_name else fallback_display_name(item_name)
 
 
-def infer_price(item: dict[str, object]) -> float:
+def infer_price_float(item: dict[str, object]) -> float:
     name = str(item["name"])
     stack_size = int(item.get("stackSize", 64))
 
-    if name in OVERRIDES:
-        return OVERRIDES[name]
+    if name in FLOAT_OVERRIDES:
+        return FLOAT_OVERRIDES[name]
 
     if stack_size >= 64:
-        price = 0.02
+        price = 0.03
     elif stack_size == 16:
         price = 0.08
     else:
-        price = 1.2
+        price = 1.3
 
     if contains_token(name, KEYWORD_SETS["farmable"]):
-        price *= 0.72
+        price *= 0.76
     if contains_token(name, KEYWORD_SETS["redstone"]):
         price *= 1.35
     if contains_token(name, KEYWORD_SETS["food"]):
-        price *= 0.92
+        price *= 0.95
     if contains_token(name, KEYWORD_SETS["rare"]):
-        price *= 6.0
+        price *= 5.8
 
     if "ore" in name:
-        price *= 2.1
+        price *= 2.0
     if "deepslate_" in name:
         price *= 1.12
     if "waxed_" in name or "oxidized_" in name:
         price *= 1.2
     if any(x in name for x in ("stairs", "fence", "trapdoor")):
-        price *= 1.2
+        price *= 1.15
     if "slab" in name:
         price *= 0.9
     if "wall" in name:
-        price *= 1.1
+        price *= 1.08
     if "concrete_powder" in name:
         price *= 0.95
     if "smithing_template" in name:
@@ -419,17 +435,74 @@ def infer_price(item: dict[str, object]) -> float:
     if any(x in name for x in ("potion", "lingering_potion", "splash_potion")):
         price *= 2.4
 
-    for entry in MATERIAL_MULTIPLIERS:
-        if entry.token in name:
-            price *= entry.multiplier
-            break
+    if "wooden_" in name:
+        price *= 0.6
+    elif "stone_" in name:
+        price *= 0.75
+    elif "iron_" in name:
+        price *= 1.9
+    elif "golden_" in name:
+        price *= 1.7
+    elif "diamond_" in name:
+        price *= 4.0
+    elif "netherite_" in name:
+        price *= 10.0
+    elif "chainmail_" in name:
+        price *= 2.6
 
     if name in LIMITED_ITEMS:
-        price *= 1.9
+        price *= 1.8
 
-    min_price = 0.003 if stack_size >= 64 else 0.012 if stack_size == 16 else 0.35
+    min_price = 0.005 if stack_size >= 64 else 0.02 if stack_size == 16 else 0.8
     max_price = 1200.0
     return min(max(price, min_price), max_price)
+
+
+def is_wood_bulk(name: str) -> bool:
+    return (
+        name.endswith("_log")
+        or name.endswith("_stem")
+        or name.endswith("_wood")
+        or name.endswith("_hyphae")
+        or name.endswith("_planks")
+    )
+
+
+def should_sell_per_item(name: str, stack_size: int) -> bool:
+    if stack_size <= 1:
+        return True
+    return contains_token(name, PER_ITEM_TOKENS)
+
+
+def trade_count_and_label(name: str, stack_size: int) -> tuple[int, str]:
+    if stack_size <= 1:
+        return 1, "шт"
+    if is_wood_bulk(name) or name == "bamboo_block":
+        return 64, "стак"
+    if should_sell_per_item(name, stack_size):
+        return 1, "шт"
+    if stack_size >= 64:
+        return 64, "стак"
+    return stack_size, f"{stack_size} шт"
+
+
+def round_price(value: float) -> int:
+    # Classic arithmetic rounding for positive numbers.
+    return max(1, int(value + 0.5))
+
+
+def infer_integer_offer(item: dict[str, object]) -> tuple[int, str, int]:
+    name = str(item["name"])
+    if name in INTEGER_OVERRIDES:
+        trade_count, price_ars = INTEGER_OVERRIDES[name]
+        label = "стак" if trade_count == 64 else "шт" if trade_count == 1 else f"{trade_count} шт"
+        return trade_count, label, price_ars
+
+    stack_size = int(item.get("stackSize", 64))
+    trade_count, trade_label = trade_count_and_label(name, stack_size)
+    unit_estimate = infer_price_float(item) * trade_count
+    price_ars = round_price(unit_estimate)
+    return trade_count, trade_label, price_ars
 
 
 def main() -> None:
@@ -443,9 +516,8 @@ def main() -> None:
             continue
 
         stack_size = int(item.get("stackSize", 64))
-        raw_price_item = infer_price(item)
-        price_item = normalize(raw_price_item)
-        stack_price = normalize(raw_price_item * stack_size) if stack_size > 1 else None
+        trade_count, trade_label, price_ars = infer_integer_offer(item)
+
         out_items.append(
             {
                 "id": int(item["id"]),
@@ -455,17 +527,20 @@ def main() -> None:
                 "stack_size": stack_size,
                 "category": classify(item_name),
                 "obtainability": obtainability(item_name),
-                "price_item": price_item,
-                "price_stack": stack_price,
+                "trade_count": trade_count,
+                "trade_label": trade_label,
+                "price_ars": price_ars,
             }
         )
 
     out_items.sort(key=lambda row: (row["category"], row["name_ru"]))
+
     payload = {
         "title": "Винд цены",
         "mc_version": VERSION,
         "currency": "ар",
         "currency_note": "1 ар = 1 алмазная руда",
+        "pricing_note": "Все цены целые, без дробей.",
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "items_count": len(out_items),
         "items": out_items,
@@ -477,9 +552,7 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    print(
-        f"Generated {len(out_items)} survival items for {VERSION} -> {OUTPUT_PATH}",
-    )
+    print(f"Generated {len(out_items)} items for {VERSION} -> {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

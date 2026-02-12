@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
@@ -6,38 +6,23 @@
     <title>Винд цены — Minecraft 1.21.11</title>
     <meta
       name="description"
-      content="Полный прайс выживаемых предметов и блоков Minecraft 1.21.11 для приватного сервера. Валюта: ары (алмазная руда)."
+      content="Сбалансированные цены для приватного сервера Minecraft 1.21.11. Валюта: ары (1 ар = 1 алмазная руда)."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;800&family=Russo+One&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Russo+One&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
     <script defer src="./app.js"></script>
   </head>
   <body>
-    <div class="bg-grid" aria-hidden="true"></div>
-    <svg class="bg-orbit" viewBox="0 0 800 800" aria-hidden="true">
-      <defs>
-        <radialGradient id="orbA" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#6ed6ff" stop-opacity="0.6"></stop>
-          <stop offset="100%" stop-color="#6ed6ff" stop-opacity="0"></stop>
-        </radialGradient>
-        <radialGradient id="orbB" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#4ea4ff" stop-opacity="0.5"></stop>
-          <stop offset="100%" stop-color="#4ea4ff" stop-opacity="0"></stop>
-        </radialGradient>
-      </defs>
-      <circle cx="220" cy="180" r="220" fill="url(#orbA)"></circle>
-      <circle cx="630" cy="540" r="260" fill="url(#orbB)"></circle>
-    </svg>
-
-    <main class="layout">
-      <header class="card hero reveal">
-        <div class="hero-left">
-          <div class="logo-shell" aria-hidden="true">
+    <div class="bg-glow" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="card hero">
+        <div class="brand-block">
+          <div class="logo-box" aria-hidden="true">
             <svg viewBox="0 0 323 394" class="logo">
               <path
                 d="M87.3754 134.668L233 50.5006L145.625 0L0.00326128 84.1661L0 252.499L87.3748 303L87.3754 134.668Z"
@@ -50,52 +35,50 @@
             </svg>
           </div>
           <div>
-            <p class="eyebrow">WIND ECONOMY INDEX</p>
+            <p class="label">WIND ECONOMY</p>
             <h1>Винд цены</h1>
             <p class="subtitle">
-              Полный прайс выживаемых предметов и блоков для Minecraft
-              <strong>1.21.11</strong>. Валюта сервера: <strong>ар</strong>
-              (алмазная руда).
+              Прайс под выживание для версии <strong>1.21.11</strong>.
+              Валюта: <strong>ар</strong> (1 ар = 1 алмазная руда).
             </p>
           </div>
         </div>
-        <div class="hero-right">
-          <article class="stat">
-            <span class="stat-label">Всего позиций</span>
+        <div class="stats">
+          <div class="stat">
+            <span>Позиций</span>
             <strong id="totalItems">...</strong>
-          </article>
-          <article class="stat">
-            <span class="stat-label">Формат цен</span>
-            <strong>сбалансировано под фермы</strong>
-          </article>
-          <article class="stat">
-            <span class="stat-label">Базовый ориентир</span>
-            <strong>1 стак брёвен = 1 ар</strong>
-          </article>
+          </div>
+          <div class="stat">
+            <span>Формат цен</span>
+            <strong>только целые ары</strong>
+          </div>
+          <div class="stat">
+            <span>База рынка</span>
+            <strong>1 стак дуба = 1 ар</strong>
+          </div>
         </div>
       </header>
 
-      <section class="card controls reveal">
-        <label class="search-shell" for="searchInput">
+      <section class="card controls">
+        <div class="search-wrap">
           <span class="search-icon" aria-hidden="true">⌕</span>
           <input
             id="searchInput"
             type="search"
             autocomplete="off"
-            placeholder="Поиск: тотем, дуб, netherite, redstone..."
+            placeholder="Поиск: дуб, тотем, незерит, редстоун..."
           />
-          <button id="clearBtn" type="button">Очистить</button>
-        </label>
+          <button id="clearBtn" type="button">Сброс</button>
+        </div>
 
-        <div class="control-row">
-          <label class="field">
+        <div class="control-grid">
+          <label>
             <span>Категория</span>
             <select id="categorySelect">
               <option value="all">Все категории</option>
             </select>
           </label>
-
-          <label class="field">
+          <label>
             <span>Получение</span>
             <select id="obtainabilitySelect">
               <option value="all">Все</option>
@@ -104,37 +87,26 @@
               <option value="Ограниченный">Ограниченный</option>
             </select>
           </label>
-
-          <label class="field">
+          <label>
             <span>Сортировка</span>
             <select id="sortSelect">
-              <option value="priceAsc">Цена: по возрастанию</option>
-              <option value="priceDesc">Цена: по убыванию</option>
-              <option value="nameAsc">Название: А-Я</option>
-              <option value="nameDesc">Название: Я-А</option>
+              <option value="priceAsc">Цена: дёшево → дорого</option>
+              <option value="priceDesc">Цена: дорого → дёшево</option>
+              <option value="nameAsc">Название: А → Я</option>
+              <option value="nameDesc">Название: Я → А</option>
             </select>
           </label>
-
-          <div class="field toggle-field">
-            <span>Режим цены</span>
-            <div class="toggle">
-              <button class="mode-btn active" data-mode="item" type="button">
-                За 1 шт
-              </button>
-              <button class="mode-btn" data-mode="stack" type="button">
-                За стак
-              </button>
-            </div>
-          </div>
         </div>
 
-        <div id="categoryChips" class="chips" aria-label="Быстрые категории"></div>
+        <p class="note" id="pricingNote">
+          Все цены целые. Дробных ар нет.
+        </p>
       </section>
 
-      <section class="card table-card reveal">
+      <section class="card table-card">
         <div class="table-head">
-          <div id="resultMeta" class="result-meta">Загрузка...</div>
-          <div id="metaInfo" class="meta-info"></div>
+          <div id="resultMeta">Загрузка...</div>
+          <div id="metaInfo"></div>
         </div>
         <div class="table-wrap">
           <table>
@@ -143,14 +115,15 @@
                 <th>Предмет</th>
                 <th>Категория</th>
                 <th>Тип</th>
-                <th>Стак</th>
-                <th>Цена/шт</th>
-                <th>Цена/стак</th>
-                <th>Активная цена</th>
+                <th>Формат продажи</th>
+                <th>Цена</th>
               </tr>
             </thead>
             <tbody id="itemsBody"></tbody>
           </table>
+        </div>
+        <div class="table-footer">
+          <button id="showMoreBtn" type="button" class="show-more">Показать ещё</button>
         </div>
       </section>
     </main>
