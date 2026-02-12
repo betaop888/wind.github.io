@@ -209,14 +209,14 @@ FLOAT_OVERRIDES = {
     "emerald_block": 4.9,
     "coal": 1 / 64,
     "charcoal": 1 / 64,
-    "lapis_lazuli": 4 / 64,
-    "redstone": 2 / 64,
+    "lapis_lazuli": 1 / 64,
+    "redstone": 1 / 64,
     "quartz": 2 / 64,
     "ancient_debris": 8.0,
     "netherite_scrap": 5.0,
     "netherite_ingot": 20.0,
     "netherite_block": 180.0,
-    "totem_of_undying": 8.0,
+    "totem_of_undying": 2.0,
     "elytra": 180.0,
     "shulker_shell": 12.0,
     "nether_star": 70.0,
@@ -269,7 +269,7 @@ INTEGER_OVERRIDES = {
     "diamond_ore": (1, 1),
     "deepslate_diamond_ore": (1, 1),
     "diamond": (1, 1),
-    "totem_of_undying": (1, 8),
+    "totem_of_undying": (1, 2),
     "golden_apple": (1, 4),
     "ghast_tear": (1, 2),
     "disc_fragment_5": (1, 4),
@@ -278,6 +278,10 @@ INTEGER_OVERRIDES = {
     "beacon": (1, 56),
     "iron_ingot": (64, 1),
     "bread": (64, 1),
+    "lapis_lazuli": (64, 1),
+    "redstone": (64, 1),
+    "coal": (64, 1),
+    "charcoal": (64, 1),
 }
 
 PER_ITEM_TOKENS = {
@@ -354,6 +358,13 @@ DEEPSLATE_PRICE_LINKS = (
     ("redstone_ore", "deepslate_redstone_ore"),
     ("lapis_ore", "deepslate_lapis_ore"),
 )
+
+UNDEFINED_PRICE_KEYS = {
+    "ghast_tear",
+    "end_crystal",
+    "dragon_egg",
+    "enchanted_golden_apple",
+}
 
 
 def fetch_json(url: str) -> object:
@@ -598,6 +609,18 @@ def stabilize_economy(rows: list[dict[str, object]]) -> None:
         ensure_total_at_least(deep, float(normal["price_ars"]))
 
 
+def apply_undefined_prices(rows: list[dict[str, object]]) -> None:
+    by_key: dict[str, dict[str, object]] = {str(row["key"]): row for row in rows}
+    for key in UNDEFINED_PRICE_KEYS:
+        row = by_key.get(key)
+        if not row:
+            continue
+        row["trade_count"] = 1
+        row["trade_label"] = "шт"
+        row["price_ars"] = None
+        row["price_note"] = "неопределенно"
+
+
 def main() -> None:
     items = fetch_json(ITEMS_URL)
     ru_lang = load_ru_lang(VERSION)
@@ -627,6 +650,7 @@ def main() -> None:
         )
 
     stabilize_economy(out_items)
+    apply_undefined_prices(out_items)
 
     out_items.sort(key=lambda row: (row["category"], row["name_ru"]))
 
@@ -635,7 +659,7 @@ def main() -> None:
         "mc_version": VERSION,
         "currency": "ар",
         "currency_note": "1 ар = 1 алмазная руда",
-        "pricing_note": "Все цены целые, без дробей. Цены руд стабилизированы под Fortune III.",
+        "pricing_note": "Все цены целые, без дробей. Отдельные редкие позиции могут иметь статус «неопределенно».",
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "items_count": len(out_items),
         "items": out_items,
