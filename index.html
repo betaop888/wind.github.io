@@ -1,0 +1,131 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Винд цены — Minecraft 1.21.11</title>
+    <meta
+      name="description"
+      content="Сбалансированные цены для приватного сервера Minecraft 1.21.11. Валюта: ары (1 ар = 1 алмазная руда)."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Russo+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260212-1" />
+    <script defer src="./app.js?v=20260212-1"></script>
+  </head>
+  <body>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="card hero">
+        <div class="brand-block">
+          <div class="logo-box" aria-hidden="true">
+            <svg viewBox="0 0 323 394" class="logo">
+              <path
+                d="M87.3754 134.668L233 50.5006L145.625 0L0.00326128 84.1661L0 252.499L87.3748 303L87.3754 134.668Z"
+                fill="currentColor"
+              />
+              <path
+                d="M323 140.667L323 309.558L176.75 394L89 343.333L235.25 258.887L235.25 90L323 140.667Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="label">WIND ECONOMY</p>
+            <h1>Винд цены</h1>
+            <p class="subtitle">
+              Прайс под выживание для версии <strong>1.21.11</strong>.
+              Валюта: <strong>ар</strong> (1 ар = 1 алмазная руда).
+            </p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span>Позиций</span>
+            <strong id="totalItems">...</strong>
+          </div>
+          <div class="stat">
+            <span>Формат цен</span>
+            <strong>только целые ары</strong>
+          </div>
+          <div class="stat">
+            <span>База рынка</span>
+            <strong>1 стак дуба = 1 ар</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="card controls">
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            id="searchInput"
+            type="search"
+            autocomplete="off"
+            placeholder="Поиск: дуб, тотем, незерит, редстоун..."
+          />
+          <button id="clearBtn" type="button">Сброс</button>
+        </div>
+
+        <div class="control-grid">
+          <label>
+            <span>Категория</span>
+            <select id="categorySelect">
+              <option value="all">Все категории</option>
+            </select>
+          </label>
+          <label>
+            <span>Получение</span>
+            <select id="obtainabilitySelect">
+              <option value="all">Все</option>
+              <option value="Фармится">Фармится</option>
+              <option value="Обычный">Обычный</option>
+              <option value="Ограниченный">Ограниченный</option>
+            </select>
+          </label>
+          <label>
+            <span>Сортировка</span>
+            <select id="sortSelect">
+              <option value="priceAsc">Цена: дёшево → дорого</option>
+              <option value="priceDesc">Цена: дорого → дёшево</option>
+              <option value="nameAsc">Название: А → Я</option>
+              <option value="nameDesc">Название: Я → А</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="note" id="pricingNote">
+          Все цены целые. Дробных ар нет.
+        </p>
+      </section>
+
+      <section class="card table-card">
+        <div class="table-head">
+          <div id="resultMeta">Загрузка...</div>
+          <div id="metaInfo"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Предмет</th>
+                <th>Категория</th>
+                <th>Тип</th>
+                <th>Формат продажи</th>
+                <th>Цена</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <button id="showMoreBtn" type="button" class="show-more">Показать ещё</button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
