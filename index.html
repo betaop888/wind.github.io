@@ -6,22 +6,23 @@
     <title>Винд цены — Minecraft 1.21.11</title>
     <meta
       name="description"
-      content="Сбалансированные цены для приватного сервера Minecraft 1.21.11. Валюта: ары (1 ар = 1 алмазная руда)."
+      content="Сбалансированные цены и анти-демпинг для приватного сервера Minecraft 1.21.11. Валюта: ары (1 ар = 1 алмазная руда)."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Russo+One&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Unbounded:wght@600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260212-3" />
-    <script defer src="./app.js?v=20260212-3"></script>
+    <link rel="stylesheet" href="./styles.css?v=20260213-1" />
+    <script defer src="./app.js?v=20260213-1"></script>
   </head>
   <body>
-    <div class="bg-glow" aria-hidden="true"></div>
-    <main class="shell">
-      <header class="panel hero">
-        <div class="brand-block">
+    <div class="noise" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <aside class="nav-rail panel" aria-label="Боковая навигация">
+        <div class="rail-brand">
           <div class="logo-box" aria-hidden="true">
             <svg viewBox="0 0 323 394" class="logo">
               <path
@@ -35,98 +36,222 @@
             </svg>
           </div>
           <div>
-            <p class="label">WIND ECONOMY</p>
+            <p class="label">WIND</p>
+            <strong>ECONOMY</strong>
+          </div>
+        </div>
+
+        <nav class="rail-links">
+          <a class="rail-link active" href="#overview">Обзор</a>
+          <a class="rail-link" href="#economy">Экономика</a>
+          <a class="rail-link" href="#market">Рынок</a>
+        </nav>
+
+        <div class="rail-shortcuts">
+          <p>Быстрые фильтры</p>
+          <button type="button" class="quick-btn" data-query="тотем">Тотемы</button>
+          <button type="button" class="quick-btn" data-query="незерит">Незерит</button>
+          <button type="button" class="quick-btn" data-query="маяк">Маяки</button>
+          <button type="button" class="quick-btn" data-query="редстоун">Редстоун</button>
+          <button type="button" class="quick-btn" data-sort="priceDesc">Топ цена</button>
+          <button type="button" class="quick-btn" data-sort="priceAsc">Мин цена</button>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="panel hero" id="overview">
+          <div class="hero-copy">
+            <p class="label">РЕГУЛИРУЕМЫЙ РЫНОК</p>
             <h1>Винд цены</h1>
             <p class="subtitle">
-              Прайс под выживание для версии <strong>1.21.11</strong>. Валюта:
-              <strong>ар</strong> (1 ар = 1 алмазная руда).
+              Черный премиум-интерфейс с анти-демпингом, фильтрами и быстрым просмотром рынка для версии
+              <strong>1.21.11</strong>.
             </p>
           </div>
-        </div>
 
-        <div class="stats">
-          <div class="stat">
-            <span>Позиций</span>
-            <strong id="totalItems">...</strong>
+          <div class="hero-stats">
+            <article class="stat-card">
+              <span>Позиции</span>
+              <strong id="totalItems">...</strong>
+            </article>
+            <article class="stat-card">
+              <span>Неопределенно</span>
+              <strong id="unknownCount">...</strong>
+            </article>
+            <article class="stat-card">
+              <span>Средняя цена</span>
+              <strong id="avgPrice">...</strong>
+            </article>
+            <article class="stat-card">
+              <span>Якорь рынка</span>
+              <strong>64 дуба = 1 ар</strong>
+            </article>
           </div>
-          <div class="stat">
-            <span>Формат</span>
-            <strong>целые ары</strong>
+        </header>
+
+        <section class="panel economy" id="economy">
+          <div class="policy-head">
+            <h2>Экономическая политика и анти-демпинг</h2>
+            <p>
+              Правила регулируемой рыночной экономики: цены свободные в рамках минимума, деньги регулярно выводятся через налоги, аренду и лицензии.
+            </p>
           </div>
-          <div class="stat">
-            <span>Рынок</span>
-            <strong>регулируемый</strong>
+
+          <div class="policy-grid">
+            <article class="policy-card">
+              <h3>Ввод аров</h3>
+              <ul id="moneyInList">
+                <li>Госзакупки</li>
+                <li>Зарплаты госработ</li>
+                <li>Бизнес</li>
+                <li>Копание аров вручную</li>
+              </ul>
+            </article>
+
+            <article class="policy-card">
+              <h3>Вывод аров</h3>
+              <ul id="moneyOutList">
+                <li>Налоги</li>
+                <li>Аренда земли</li>
+                <li>Лицензии</li>
+                <li>Штрафы</li>
+              </ul>
+            </article>
+
+            <article class="policy-card">
+              <h3>Аренда и площадь</h3>
+              <p class="policy-line">Ежемесячная аренда бизнеса: <strong>32 ара</strong></p>
+              <ul id="sizeCoefficientsList">
+                <li>до 100 блоков: без надбавки</li>
+                <li>101-200 блоков: +20%</li>
+                <li>200+ блоков: +35%</li>
+              </ul>
+            </article>
+
+            <article class="policy-card">
+              <h3>Налог с оборота</h3>
+              <ul id="turnoverTaxList">
+                <li>Торговый: +10%</li>
+                <li>Сервисный: +15%</li>
+                <li>Премиальный: +20%</li>
+              </ul>
+            </article>
+
+            <article class="policy-card wide">
+              <h3>Лицензии</h3>
+              <div class="license-grid">
+                <div>
+                  <p>На спавне</p>
+                  <ul id="licenseSpawnList">
+                    <li>Торговый: 32 ара</li>
+                    <li>Сервисный: 48 ар</li>
+                    <li>Премиальный: 64 ара</li>
+                  </ul>
+                </div>
+                <div>
+                  <p>Вне спавна (каждые 2 недели)</p>
+                  <ul id="licenseOutsideList">
+                    <li>Торговый: 64 ара</li>
+                    <li>Сервисный: 72 ар</li>
+                    <li>Премиальный: 96 ар</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="policy-card wide anti-card">
+              <h3>Анти-демпинг: минимальные цены</h3>
+              <p id="antiRuleText">
+                Цена ниже минимума — штраф или временное закрытие бизнеса.
+              </p>
+              <div class="mini-table-wrap">
+                <table class="mini-table">
+                  <thead>
+                    <tr>
+                      <th>Товар</th>
+                      <th>Минимум</th>
+                      <th>Формат</th>
+                    </tr>
+                  </thead>
+                  <tbody id="antiDumpTableBody">
+                    <tr>
+                      <td colspan="3">Загрузка...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
           </div>
-        </div>
-      </header>
+        </section>
 
-      <section class="panel controls">
-        <div class="search-wrap">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <input
-            id="searchInput"
-            type="search"
-            autocomplete="off"
-            placeholder="Поиск: дуб, тотем, незерит, редстоун..."
-          />
-          <button id="clearBtn" type="button">Сброс</button>
-        </div>
+        <section class="panel controls" id="market">
+          <div class="search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input
+              id="searchInput"
+              type="search"
+              autocomplete="off"
+              placeholder="Поиск: дуб, тотем, незерит, редстоун..."
+            />
+            <button id="clearBtn" type="button">Сброс</button>
+          </div>
 
-        <div class="control-grid">
-          <label>
-            <span>Категория</span>
-            <select id="categorySelect">
-              <option value="all">Все категории</option>
-            </select>
-          </label>
-          <label>
-            <span>Получение</span>
-            <select id="obtainabilitySelect">
-              <option value="all">Все</option>
-              <option value="Фармится">Фармится</option>
-              <option value="Обычный">Обычный</option>
-              <option value="Ограниченный">Ограниченный</option>
-            </select>
-          </label>
-          <label>
-            <span>Сортировка</span>
-            <select id="sortSelect">
-              <option value="priceAsc">Цена: дёшево → дорого</option>
-              <option value="priceDesc">Цена: дорого → дёшево</option>
-              <option value="nameAsc">Название: А → Я</option>
-              <option value="nameDesc">Название: Я → А</option>
-            </select>
-          </label>
-        </div>
+          <div class="control-grid">
+            <label>
+              <span>Категория</span>
+              <select id="categorySelect">
+                <option value="all">Все категории</option>
+              </select>
+            </label>
+            <label>
+              <span>Получение</span>
+              <select id="obtainabilitySelect">
+                <option value="all">Все</option>
+                <option value="Фармится">Фармится</option>
+                <option value="Обычный">Обычный</option>
+                <option value="Ограниченный">Ограниченный</option>
+              </select>
+            </label>
+            <label>
+              <span>Сортировка</span>
+              <select id="sortSelect">
+                <option value="priceAsc">Цена: дёшево → дорого</option>
+                <option value="priceDesc">Цена: дорого → дёшево</option>
+                <option value="nameAsc">Название: А → Я</option>
+                <option value="nameDesc">Название: Я → А</option>
+              </select>
+            </label>
+          </div>
 
-        <p class="note" id="pricingNote">
-          Все цены целые. Отдельные редкие позиции могут иметь статус «неопределенно».
-        </p>
-      </section>
+          <p class="note" id="pricingNote">Все цены целые. Дробных ар нет.</p>
+        </section>
 
-      <section class="panel table-card">
-        <div class="table-head">
-          <div id="resultMeta">Загрузка...</div>
-          <div id="metaInfo"></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Предмет</th>
-                <th>Категория</th>
-                <th>Тип</th>
-                <th>Формат продажи</th>
-                <th>Цена</th>
-              </tr>
-            </thead>
-            <tbody id="itemsBody"></tbody>
-          </table>
-        </div>
-        <div class="table-footer">
-          <button id="showMoreBtn" type="button" class="show-more">Показать ещё</button>
-        </div>
-      </section>
-    </main>
+        <section class="panel table-card">
+          <div class="table-head">
+            <div id="resultMeta">Загрузка...</div>
+            <div id="metaInfo"></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Предмет</th>
+                  <th>Категория</th>
+                  <th>Тип</th>
+                  <th>Формат продажи</th>
+                  <th>Цена</th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <button id="showMoreBtn" type="button" class="show-more">Показать ещё</button>
+          </div>
+        </section>
+      </main>
+    </div>
   </body>
 </html>

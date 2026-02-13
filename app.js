@@ -3,6 +3,7 @@
 const state = {
   items: [],
   filtered: [],
+  policy: null,
   query: "",
   category: "all",
   obtainability: "all",
@@ -12,6 +13,45 @@ const state = {
   version: "",
   generatedAt: "",
   currency: "ар",
+};
+
+const TEXTURE_ROOT =
+  "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures";
+
+const DEFAULT_POLICY = {
+  money_in: ["Госзакупки", "Зарплаты госработ", "Малый и крупный бизнес", "Копание аров вручную"],
+  money_out: ["Налоги", "Аренда земли", "Лицензии", "Штрафы", "Госпошлины (на доработке)"],
+  size_coefficients: [
+    "до 100 блоков: без надбавки",
+    "101-200 блоков: +20%",
+    "200+ блоков: +35%",
+  ],
+  turnover_tax: {
+    trading: "10%",
+    service: "15%",
+    premium: "20%",
+  },
+  licenses_spawn: {
+    trading_ars: 32,
+    service_ars: 48,
+    premium_ars: 64,
+  },
+  licenses_outside_spawn_2weeks: {
+    trading_ars: 64,
+    service_ars: 72,
+    premium_ars: 96,
+  },
+  anti_dumping: {
+    rule: "Цена ниже минимума — штраф или временное закрытие бизнеса.",
+    minimum_prices: [
+      { key: "netherite_ingot", trade_count: 1, min_price_ars: 20 },
+      { key: "beacon", trade_count: 1, min_price_ars: 50 },
+      { key: "totem_of_undying", trade_count: 1, min_price_ars: 2 },
+      { key: "elytra", trade_count: 1, min_price_ars: 120 },
+      { key: "dragon_head", trade_count: 1, min_price_ars: 90 },
+      { key: "shulker_shell", trade_count: 1, min_price_ars: 10 },
+    ],
+  },
 };
 
 const refs = {
@@ -28,7 +68,16 @@ const refs = {
   showMoreBtn: document.querySelector("#showMoreBtn"),
   unknownCount: document.querySelector("#unknownCount"),
   avgPrice: document.querySelector("#avgPrice"),
+  quickButtons: document.querySelectorAll(".quick-btn"),
   activityMap: document.querySelector("#activityMap"),
+  moneyInList: document.querySelector("#moneyInList"),
+  moneyOutList: document.querySelector("#moneyOutList"),
+  sizeCoefficientsList: document.querySelector("#sizeCoefficientsList"),
+  turnoverTaxList: document.querySelector("#turnoverTaxList"),
+  licenseSpawnList: document.querySelector("#licenseSpawnList"),
+  licenseOutsideList: document.querySelector("#licenseOutsideList"),
+  antiRuleText: document.querySelector("#antiRuleText"),
+  antiDumpTableBody: document.querySelector("#antiDumpTableBody"),
 };
 
 const hasCoreRefs =
@@ -57,6 +106,16 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
+const textureUrl = (type, key) => `${TEXTURE_ROOT}/${type}/${encodeURIComponent(key)}.png`;
+
+const itemIconText = (nameRu) => {
+  const cleaned = String(nameRu || "").replace(/[^\p{L}\p{N}]/gu, "");
+  const short = cleaned.slice(0, 2) || "??";
+  return short.toUpperCase();
+};
+
+const tradeCountLabel = (count) => `${Number(count) || 1} шт`;
+
 const getNumericPrice = (item) =>
   typeof item.price_ars === "number" && Number.isFinite(item.price_ars)
     ? item.price_ars
@@ -72,6 +131,119 @@ const saleFormatText = (item) => {
   if (item.trade_label === "стак") return `стак (${item.trade_count} шт)`;
   return `${item.trade_count} шт`;
 };
+
+function attachIconFallbacks() {
+  const icons = document.querySelectorAll(".item-icon");
+  if (!icons.length) return;
+
+  const onLoad = (event) => {
+    const img = event.currentTarget;
+    const media = img.closest(".item-media");
+    if (media) media.classList.remove("fallback");
+  };
+
+  const onError = (event) => {
+    const img = event.currentTarget;
+    const media = img.closest(".item-media");
+    const altSrc = img.dataset.altSrc;
+    const stage = img.dataset.stage || "item";
+
+    if (stage === "item" && altSrc) {
+      img.dataset.stage = "block";
+      img.src = altSrc;
+      return;
+    }
+
+    img.classList.add("missing");
+    if (media) media.classList.add("fallback");
+    img.removeEventListener("load", onLoad);
+    img.removeEventListener("error", onError);
+  };
+
+  icons.forEach((img) => {
+    img.addEventListener("load", onLoad);
+    img.addEventListener("error", onError);
+  });
+}
+
+function renderList(node, values) {
+  if (!node || !Array.isArray(values) || !values.length) return;
+  node.innerHTML = values.map((value) => `<li>${escapeHtml(value)}</li>`).join("");
+}
+
+function renderPolicy() {
+  const policy = state.policy || DEFAULT_POLICY;
+  if (!policy) return;
+
+  renderList(refs.moneyInList, policy.money_in || policy.moneyIn);
+  renderList(refs.moneyOutList, policy.money_out || policy.moneyOut);
+  renderList(
+    refs.sizeCoefficientsList,
+    policy.size_coefficients || policy.sizeCoefficients || [],
+  );
+
+  if (refs.turnoverTaxList && policy.turnover_tax) {
+    const tax = policy.turnover_tax;
+    const rows = [
+      `Торговый: +${String(tax.trading || tax.trade || "10%")}`,
+      `Сервисный: +${String(tax.service || "15%")}`,
+      `Премиальный: +${String(tax.premium || "20%")}`,
+    ];
+    refs.turnoverTaxList.innerHTML = rows.map((row) => `<li>${escapeHtml(row)}</li>`).join("");
+  }
+
+  if (refs.licenseSpawnList && policy.licenses_spawn) {
+    const ls = policy.licenses_spawn;
+    refs.licenseSpawnList.innerHTML = [
+      `Торговый: ${ls.trading_ars ?? ls.trading ?? 32} ар`,
+      `Сервисный: ${ls.service_ars ?? ls.service ?? 48} ар`,
+      `Премиальный: ${ls.premium_ars ?? ls.premium ?? 64} ар`,
+    ]
+      .map((line) => `<li>${escapeHtml(line)}</li>`)
+      .join("");
+  }
+
+  if (refs.licenseOutsideList && policy.licenses_outside_spawn_2weeks) {
+    const lo = policy.licenses_outside_spawn_2weeks;
+    refs.licenseOutsideList.innerHTML = [
+      `Торговый: ${lo.trading_ars ?? lo.trading ?? 64} ар`,
+      `Сервисный: ${lo.service_ars ?? lo.service ?? 72} ар`,
+      `Премиальный: ${lo.premium_ars ?? lo.premium ?? 96} ар`,
+    ]
+      .map((line) => `<li>${escapeHtml(line)}</li>`)
+      .join("");
+  }
+
+  if (refs.antiRuleText && policy.anti_dumping?.rule) {
+    refs.antiRuleText.textContent = policy.anti_dumping.rule;
+  }
+
+  if (refs.antiDumpTableBody) {
+    const mins = policy.anti_dumping?.minimum_prices || [];
+    const byKey = new Map(state.items.map((item) => [item.key, item]));
+
+    if (!mins.length) {
+      refs.antiDumpTableBody.innerHTML = "<tr><td colspan='3'>Минимумы не заданы.</td></tr>";
+      return;
+    }
+
+    refs.antiDumpTableBody.innerHTML = mins
+      .map((rule) => {
+        const item = byKey.get(rule.key);
+        const title = item ? item.name_ru : rule.key;
+        const currentPrice =
+          item && typeof item.price_ars === "number" ? `${item.price_ars} ${state.currency}` : "н/д";
+        const minPrice = `${rule.min_price_ars} ${state.currency}`;
+        const unit = tradeCountLabel(rule.trade_count);
+        return `<tr>
+          <td>${escapeHtml(title)}</td>
+          <td>${escapeHtml(`${minPrice} (сейчас ${currentPrice})`)}</td>
+          <td>${escapeHtml(unit)}</td>
+        </tr>`;
+      })
+      .join("");
+  }
+}
 
 function computeFiltered() {
   const queryNorm = normalizeText(state.query);
@@ -126,12 +298,29 @@ function renderRows() {
             : "";
 
       const isUnknown = getNumericPrice(item) === null;
+      const fallback = escapeHtml(itemIconText(item.name_ru));
+      const primaryIcon = escapeHtml(textureUrl("item", item.key));
+      const secondaryIcon = escapeHtml(textureUrl("block", item.key));
+      const altText = escapeHtml(item.name_ru);
 
       return `<tr>
         <td>
-          <div class="item">
-            <strong>${escapeHtml(item.name_ru)}</strong>
-            <small>${escapeHtml(item.key)} · ${escapeHtml(item.name_en)}</small>
+          <div class="item-row">
+            <div class="item-media" data-fallback="${fallback}">
+              <img
+                class="item-icon"
+                loading="lazy"
+                decoding="async"
+                src="${primaryIcon}"
+                data-alt-src="${secondaryIcon}"
+                data-stage="item"
+                alt="${altText}"
+              />
+            </div>
+            <div class="item">
+              <strong>${escapeHtml(item.name_ru)}</strong>
+              <small>${escapeHtml(item.key)} · ${escapeHtml(item.name_en)}</small>
+            </div>
           </div>
         </td>
         <td><span class="badge">${escapeHtml(item.category)}</span></td>
@@ -141,6 +330,8 @@ function renderRows() {
       </tr>`;
     })
     .join("");
+
+  attachIconFallbacks();
 }
 
 function renderMeta() {
@@ -240,6 +431,28 @@ function bindEvents() {
       render();
     });
   }
+
+  if (refs.quickButtons && refs.quickButtons.length) {
+    refs.quickButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const quickQuery = button.getAttribute("data-query");
+        const quickSort = button.getAttribute("data-sort");
+
+        if (quickQuery) {
+          state.query = quickQuery;
+          refs.searchInput.value = quickQuery;
+          resetAndRender();
+          return;
+        }
+
+        if (quickSort) {
+          state.sort = quickSort;
+          refs.sortSelect.value = quickSort;
+          resetAndRender();
+        }
+      });
+    });
+  }
 }
 
 function resolveDataUrl() {
@@ -287,6 +500,7 @@ async function bootstrap() {
     state.version = payload.mc_version || "";
     state.generatedAt = payload.generated_at || "";
     state.currency = payload.currency || "ар";
+    state.policy = payload.economy_policy || null;
 
     state.items = (payload.items || []).map((item) => {
       const numericPrice =
@@ -299,7 +513,9 @@ async function bootstrap() {
         trade_count: Number(item.trade_count) || 1,
         price_ars: numericPrice,
         search_text: normalizeText(
-          `${item.name_ru} ${item.name_en} ${item.key} ${item.price_note || ""}`,
+          `${item.name_ru} ${item.name_en} ${item.key} ${item.price_note || ""} ${
+            item.category || ""
+          } ${item.obtainability || ""}`,
         ),
       };
     });
@@ -312,6 +528,7 @@ async function bootstrap() {
     initCategorySelect();
     bindEvents();
     renderActivityMap();
+    renderPolicy();
     render();
   } catch (error) {
     refs.resultMeta.textContent = "Ошибка загрузки данных";

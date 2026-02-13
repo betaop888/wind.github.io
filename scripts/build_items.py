@@ -284,6 +284,76 @@ INTEGER_OVERRIDES = {
     "charcoal": (64, 1),
 }
 
+ANTI_DUMP_MINIMUMS = {
+    # key: (trade_count, minimum price in ars)
+    "netherite_ingot": (1, 20),
+    "beacon": (1, 50),
+    "totem_of_undying": (1, 2),
+    "elytra": (1, 120),
+    "dragon_head": (1, 90),
+    "shulker_shell": (1, 10),
+}
+
+ECONOMY_POLICY = {
+    "system_type": "регулируемая рыночная экономика",
+    "principles": [
+        "Рынок формирует цены, но в разумных рамках.",
+        "Деньги постоянно выводятся из экономики (налоги, сборы).",
+        "Малый и крупный бизнес выгодно открывать везде, но это не бесплатно.",
+    ],
+    "money_in": [
+        "Госзакупки",
+        "Зарплаты госработ",
+        "Малый и крупный бизнес",
+        "Копание аров вручную",
+    ],
+    "money_out": [
+        "Налоги",
+        "Аренда земли",
+        "Лицензии",
+        "Штрафы",
+        "Госпошлины (на доработке)",
+    ],
+    "land_types": [
+        "Государственная: спавн (оверворлд, ад), только аренда.",
+        "Коммерческая: вне спавна, облагается налогом.",
+    ],
+    "spawn_rent_formula": "Цена = площадь в блоках",
+    "monthly_business_rent_ars": 32,
+    "size_coefficients": [
+        "до 100 блоков: без надбавки",
+        "101-200 блоков: +20%",
+        "200+ блоков: +35%",
+    ],
+    "business_types": [
+        "Торговый (магазины, ТЦ)",
+        "Сервисный (казино, строительные компании и т.д.)",
+        "Премиальный (редкие товары: элитры, маяки и т.д.)",
+    ],
+    "turnover_tax": {
+        "trading": "10%",
+        "service": "15%",
+        "premium": "20%",
+    },
+    "anti_dumping": {
+        "rule": "Цена ниже минимума — штраф или временное закрытие бизнеса.",
+        "minimum_prices": [
+            {"key": key, "trade_count": offer[0], "min_price_ars": offer[1]}
+            for key, offer in ANTI_DUMP_MINIMUMS.items()
+        ],
+    },
+    "licenses_spawn": {
+        "trading_ars": 32,
+        "service_ars": 48,
+        "premium_ars": 64,
+    },
+    "licenses_outside_spawn_2weeks": {
+        "trading_ars": 64,
+        "service_ars": 72,
+        "premium_ars": 96,
+    },
+}
+
 PER_ITEM_TOKENS = {
     "diamond",
     "netherite",
@@ -609,6 +679,20 @@ def stabilize_economy(rows: list[dict[str, object]]) -> None:
         ensure_total_at_least(deep, float(normal["price_ars"]))
 
 
+def enforce_antidumping(rows: list[dict[str, object]]) -> None:
+    by_key: dict[str, dict[str, object]] = {str(row["key"]): row for row in rows}
+
+    for key, (trade_count, min_price_ars) in ANTI_DUMP_MINIMUMS.items():
+        row = by_key.get(key)
+        if not row:
+            continue
+        if row["price_ars"] is None:
+            continue
+        row["trade_count"] = trade_count
+        row["trade_label"] = "шт" if trade_count == 1 else "стак" if trade_count == 64 else f"{trade_count} шт"
+        row["price_ars"] = max(int(row["price_ars"]), int(min_price_ars))
+
+
 def apply_undefined_prices(rows: list[dict[str, object]]) -> None:
     by_key: dict[str, dict[str, object]] = {str(row["key"]): row for row in rows}
     for key in UNDEFINED_PRICE_KEYS:
@@ -650,6 +734,7 @@ def main() -> None:
         )
 
     stabilize_economy(out_items)
+    enforce_antidumping(out_items)
     apply_undefined_prices(out_items)
 
     out_items.sort(key=lambda row: (row["category"], row["name_ru"]))
@@ -659,7 +744,8 @@ def main() -> None:
         "mc_version": VERSION,
         "currency": "ар",
         "currency_note": "1 ар = 1 алмазная руда",
-        "pricing_note": "Все цены целые, без дробей. Отдельные редкие позиции могут иметь статус «неопределенно».",
+        "pricing_note": "Все цены целые, без дробей. Анти-демпинг для ключевых товаров включен. Отдельные редкие позиции могут иметь статус «неопределенно».",
+        "economy_policy": ECONOMY_POLICY,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "items_count": len(out_items),
         "items": out_items,
