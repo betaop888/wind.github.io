@@ -536,8 +536,9 @@ function renderRows() {
 
       const isUnknown = getNumericPrice(item) === null;
       const fallback = escapeHtml(itemIconText(item.name_ru));
-      const primaryIcon = escapeHtml(textureUrl("item", item.key));
-      const secondaryIcon = escapeHtml(textureUrl("block", item.key));
+      const iconKey = item.icon_key || item.key;
+      const primaryIcon = escapeHtml(textureUrl("item", iconKey));
+      const secondaryIcon = escapeHtml(textureUrl("block", iconKey));
       const altText = escapeHtml(item.name_ru);
 
       return `<tr>

@@ -587,6 +587,145 @@ CUSTOM_ITEMS = [
     },
 ]
 
+ROMAN_LEVELS = {
+    1: "I",
+    2: "II",
+    3: "III",
+    4: "IV",
+    5: "V",
+}
+
+ENCHANTED_BOOK_VARIANTS = [
+    # Armor
+    {"key": "protection", "name_ru": "Защита", "name_en": "Protection", "max_level": 4, "tier": 2},
+    {
+        "key": "fire_protection",
+        "name_ru": "Огнеупорность",
+        "name_en": "Fire Protection",
+        "max_level": 4,
+        "tier": 2,
+    },
+    {
+        "key": "blast_protection",
+        "name_ru": "Взрывоустойчивость",
+        "name_en": "Blast Protection",
+        "max_level": 4,
+        "tier": 2,
+    },
+    {
+        "key": "projectile_protection",
+        "name_ru": "Защита от снарядов",
+        "name_en": "Projectile Protection",
+        "max_level": 4,
+        "tier": 2,
+    },
+    {
+        "key": "feather_falling",
+        "name_ru": "Невесомость",
+        "name_en": "Feather Falling",
+        "max_level": 4,
+        "tier": 2,
+    },
+    {"key": "thorns", "name_ru": "Шипы", "name_en": "Thorns", "max_level": 3, "tier": 3},
+    {"key": "respiration", "name_ru": "Подводник", "name_en": "Respiration", "max_level": 3, "tier": 2},
+    {"key": "aqua_affinity", "name_ru": "Подводная спешка", "name_en": "Aqua Affinity", "max_level": 1, "tier": 2},
+    {
+        "key": "depth_strider",
+        "name_ru": "Подводная ходьба",
+        "name_en": "Depth Strider",
+        "max_level": 3,
+        "tier": 2,
+    },
+    {
+        "key": "frost_walker",
+        "name_ru": "Ледоход",
+        "name_en": "Frost Walker",
+        "max_level": 2,
+        "tier": 3,
+        "treasure": True,
+    },
+    {
+        "key": "binding_curse",
+        "name_ru": "Проклятие несъёмности",
+        "name_en": "Curse of Binding",
+        "max_level": 1,
+        "tier": 2,
+        "treasure": True,
+    },
+    {
+        "key": "soul_speed",
+        "name_ru": "Скорость души",
+        "name_en": "Soul Speed",
+        "max_level": 3,
+        "tier": 3,
+        "treasure": True,
+    },
+    {
+        "key": "swift_sneak",
+        "name_ru": "Проворство",
+        "name_en": "Swift Sneak",
+        "max_level": 3,
+        "tier": 4,
+        "treasure": True,
+    },
+    # Weapons
+    {"key": "sharpness", "name_ru": "Острота", "name_en": "Sharpness", "max_level": 5, "tier": 3},
+    {"key": "smite", "name_ru": "Небесная кара", "name_en": "Smite", "max_level": 5, "tier": 2},
+    {
+        "key": "bane_of_arthropods",
+        "name_ru": "Бич членистоногих",
+        "name_en": "Bane of Arthropods",
+        "max_level": 5,
+        "tier": 2,
+    },
+    {"key": "knockback", "name_ru": "Отдача", "name_en": "Knockback", "max_level": 2, "tier": 2},
+    {"key": "fire_aspect", "name_ru": "Заговор огня", "name_en": "Fire Aspect", "max_level": 2, "tier": 3},
+    {"key": "looting", "name_ru": "Добыча", "name_en": "Looting", "max_level": 3, "tier": 3},
+    {
+        "key": "sweeping_edge",
+        "name_ru": "Разящий клинок",
+        "name_en": "Sweeping Edge",
+        "max_level": 3,
+        "tier": 2,
+    },
+    # Tools
+    {"key": "efficiency", "name_ru": "Эффективность", "name_en": "Efficiency", "max_level": 5, "tier": 2},
+    {"key": "silk_touch", "name_ru": "Шёлковое касание", "name_en": "Silk Touch", "max_level": 1, "tier": 4},
+    {"key": "unbreaking", "name_ru": "Прочность", "name_en": "Unbreaking", "max_level": 3, "tier": 2},
+    {"key": "fortune", "name_ru": "Удача", "name_en": "Fortune", "max_level": 3, "tier": 4},
+    # Bow
+    {"key": "power", "name_ru": "Сила", "name_en": "Power", "max_level": 5, "tier": 2},
+    {"key": "punch", "name_ru": "Отбрасывание", "name_en": "Punch", "max_level": 2, "tier": 2},
+    {"key": "flame", "name_ru": "Горящая стрела", "name_en": "Flame", "max_level": 1, "tier": 3},
+    {"key": "infinity", "name_ru": "Бесконечность", "name_en": "Infinity", "max_level": 1, "tier": 4},
+    # Fishing rod
+    {"key": "luck_of_the_sea", "name_ru": "Удача моря", "name_en": "Luck of the Sea", "max_level": 3, "tier": 3},
+    {"key": "lure", "name_ru": "Приманка", "name_en": "Lure", "max_level": 3, "tier": 2},
+    # Trident
+    {"key": "loyalty", "name_ru": "Верность", "name_en": "Loyalty", "max_level": 3, "tier": 3},
+    {"key": "impaling", "name_ru": "Пронзатель", "name_en": "Impaling", "max_level": 5, "tier": 2},
+    {"key": "riptide", "name_ru": "Тягун", "name_en": "Riptide", "max_level": 3, "tier": 3},
+    {"key": "channeling", "name_ru": "Громовержец", "name_en": "Channeling", "max_level": 1, "tier": 4},
+    # Crossbow
+    {"key": "multishot", "name_ru": "Тройной выстрел", "name_en": "Multishot", "max_level": 1, "tier": 3},
+    {"key": "piercing", "name_ru": "Пробивание", "name_en": "Piercing", "max_level": 4, "tier": 2},
+    {"key": "quick_charge", "name_ru": "Быстрая перезарядка", "name_en": "Quick Charge", "max_level": 3, "tier": 2},
+    # Mace (1.21)
+    {"key": "density", "name_ru": "Плотность", "name_en": "Density", "max_level": 5, "tier": 3},
+    {"key": "breach", "name_ru": "Пробой", "name_en": "Breach", "max_level": 4, "tier": 3},
+    {"key": "wind_burst", "name_ru": "Порыв ветра", "name_en": "Wind Burst", "max_level": 3, "tier": 4},
+    # Universal / curses
+    {"key": "mending", "name_ru": "Починка", "name_en": "Mending", "max_level": 1, "tier": 5, "treasure": True},
+    {
+        "key": "vanishing_curse",
+        "name_ru": "Проклятие утраты",
+        "name_en": "Curse of Vanishing",
+        "max_level": 1,
+        "tier": 2,
+        "treasure": True,
+    },
+]
+
 PER_ITEM_TOKENS = {
     "diamond",
     "netherite",
@@ -858,6 +997,47 @@ def round_price(value: float) -> int:
     return max(1, int(value + 0.5))
 
 
+def enchanted_book_price(level: int, tier: int, treasure: bool) -> int:
+    level_factor = 2.5 + (level * 1.5)
+    tier_factor = 1.0 + (max(1, tier) - 1) * 0.22
+    treasure_factor = 1.25 if treasure else 1.0
+    return round_price(level_factor * tier_factor * treasure_factor)
+
+
+def build_enchanted_book_items(start_id: int = 210000) -> list[dict[str, object]]:
+    result: list[dict[str, object]] = []
+    next_id = start_id
+
+    for enchant in ENCHANTED_BOOK_VARIANTS:
+        enchant_key = str(enchant["key"])
+        name_ru = str(enchant["name_ru"])
+        name_en = str(enchant["name_en"])
+        max_level = int(enchant["max_level"])
+        tier = int(enchant.get("tier", 2))
+        treasure = bool(enchant.get("treasure", False))
+
+        for level in range(1, max_level + 1):
+            roman_level = ROMAN_LEVELS.get(level, str(level))
+            result.append(
+                {
+                    "id": next_id,
+                    "key": f"enchanted_book_{enchant_key}_{level}",
+                    "icon_key": "enchanted_book",
+                    "name_ru": f"Зачарованная книга: {name_ru} {roman_level}",
+                    "name_en": f"Enchanted Book: {name_en} {roman_level}",
+                    "stack_size": 1,
+                    "category": "Зачарованные книги",
+                    "obtainability": "Ограниченный" if treasure else "Обычный",
+                    "trade_count": 1,
+                    "trade_label": "шт",
+                    "price_ars": enchanted_book_price(level, tier, treasure),
+                }
+            )
+            next_id += 1
+
+    return result
+
+
 def ceil_price(value: float) -> int:
     return max(1, int(math.ceil(value - 1e-9)))
 
@@ -972,9 +1152,18 @@ def main() -> None:
 
     existing_keys = {str(row["key"]) for row in out_items}
     for custom_item in CUSTOM_ITEMS:
-        if str(custom_item["key"]) in existing_keys:
+        custom_key = str(custom_item["key"])
+        if custom_key in existing_keys:
             continue
         out_items.append(dict(custom_item))
+        existing_keys.add(custom_key)
+
+    for book_item in build_enchanted_book_items():
+        book_key = str(book_item["key"])
+        if book_key in existing_keys:
+            continue
+        out_items.append(book_item)
+        existing_keys.add(book_key)
 
     out_items.sort(key=lambda row: (row["category"], row["name_ru"]))
 
