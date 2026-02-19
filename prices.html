@@ -11,8 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260213-4" />
-    <script defer src="./app.js?v=20260213-4"></script>
+    <link rel="stylesheet" href="./styles.css?v=20260219-3" />
+    <script defer src="./app.js?v=20260219-3"></script>
   </head>
   <body>
     <div class="layout">
@@ -56,9 +56,36 @@
       </aside>
 
       <main class="content">
+        <section class="panel hero-panel hero-panel-compact">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">РЫНОК WIND</p>
+              <h1>
+                <span class="text-plain">Market</span><span class="text-accent">Prices</span>
+              </h1>
+              <p class="hero-description">
+                Смотри актуальные цены, фильтруй ассортимент и проверяй анти-демпинговые пороги.
+              </p>
+              <div class="hero-actions">
+                <a class="primary-btn" href="./codex.html">Открыть кодекс</a>
+                <a class="secondary-btn" href="./dashboard.html">На главную</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="prices-top-grid">
           <article class="panel filter-panel">
-            <h1>Рынок цен</h1>
+            <div class="section-head">
+              <h2>Позиции рынка</h2>
+              <span class="count-pill" id="resultMeta">Загрузка...</span>
+            </div>
+
+            <div class="chip-tabs">
+              <button type="button" class="chip-tab quick-btn active" data-sort="nameAsc">Все</button>
+              <button type="button" class="chip-tab quick-btn" data-sort="priceAsc">Сначала дешёвые</button>
+              <button type="button" class="chip-tab quick-btn" data-sort="priceDesc">Сначала дорогие</button>
+            </div>
 
             <div class="search-wrap">
               <span class="search-icon" aria-hidden="true">⌕</span>
@@ -123,7 +150,7 @@
 
         <section class="panel prices-table-panel">
           <div class="table-head">
-            <div id="resultMeta">Загрузка...</div>
+            <div>Каталог предметов и ресурсов</div>
             <a class="ghost-link" href="./codex.html">Смотреть санкции</a>
           </div>
 

@@ -283,6 +283,15 @@ function syncUrlState() {
   window.history.replaceState({}, "", `${url.pathname}${params.toString() ? `?${params}` : ""}`);
 }
 
+function syncChipTabs() {
+  const sortTabs = document.querySelectorAll(".chip-tab[data-sort]");
+  if (!sortTabs.length) return;
+  sortTabs.forEach((tab) => {
+    const isActive = tab.getAttribute("data-sort") === state.sort;
+    tab.classList.toggle("active", isActive);
+  });
+}
+
 function goToPricesWithParams(query = "", sort = "") {
   if (typeof window === "undefined") return;
   const url = new URL("./prices.html", window.location.href);
@@ -673,6 +682,7 @@ function bindEvents() {
   if (refs.sortSelect && refs.itemsBody) {
     refs.sortSelect.addEventListener("change", (event) => {
       state.sort = event.target.value;
+      syncChipTabs();
       syncUrlState();
       resetAndRender();
     });
@@ -713,6 +723,7 @@ function bindEvents() {
           if (refs.sortSelect && refs.itemsBody) {
             state.sort = quickSort;
             refs.sortSelect.value = quickSort;
+            syncChipTabs();
             syncUrlState();
             resetAndRender();
           } else {
@@ -791,6 +802,7 @@ async function bootstrap() {
 
     if (hasMarketFilters) initCategorySelect();
     parseUrlState();
+    syncChipTabs();
     bindEvents();
     renderActivityMap();
     renderPolicy();
